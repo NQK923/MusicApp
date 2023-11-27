@@ -39,8 +39,7 @@
                 android:paddingTop="@dimen/sm"
                 android:maxLines="1"
                 android:textStyle="bold"
-                android:text="NQK"
-                android:textColor="@color/white">
+                android:text="NQK">
             </TextView>
             <TextView
                 android:id="@+id/durationView"
@@ -53,7 +52,7 @@
                 android:layout_marginStart="@dimen/sm"
             ></TextView>
             <TextView
-                android:id="@+id/pathView"
+                android:id="@+id/singerView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@id/durationView"
@@ -61,6 +60,19 @@
                 android:text="Nothing"
                 android:layout_marginBottom="@dimen/xx_sm"
                 android:layout_marginStart="@dimen/lg"
+                ></TextView>
+            <TextView
+                android:id="@+id/albumView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/titleView"
+                app:layout_constraintTop_toTopOf="parent"
+                android:text="Nothing"
+                android:layout_marginBottom="2dp"
+                android:layout_marginRight="2dp"
+                android:paddingTop="@dimen/sm"
+                android:layout_marginStart="50dp"
+                android:textStyle="bold"
                 ></TextView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 

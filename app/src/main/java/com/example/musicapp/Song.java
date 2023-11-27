@@ -6,14 +6,17 @@ public class Song {
     String title;
     Uri uri;
     Uri artworkUri;
-    String path;
     int duration;
-    public Song(String title, Uri uri, Uri artworkUri, String path, int duration) {
+    String album;
+    String singer;
+
+    public Song(String title, Uri uri, Uri artworkUri, int duration, String album, String singer) {
         this.title = title;
         this.uri = uri;
         this.artworkUri = artworkUri;
-        this.path = path;
         this.duration = duration;
+        this.album = album;
+        this.singer = singer;
     }
 
     public String getTitle() {
@@ -40,19 +43,27 @@ public class Song {
         this.artworkUri = artworkUri;
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public int getDuration() {
         return duration;
     }
 
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+
+    public String getAlbum() {
+        return album;
+    }
+
+    public void setAlbum(String album) {
+        this.album = album;
+    }
+
+    public String getSinger() {
+        return singer;
+    }
+
+    public void setSinger(String singer) {
+        this.singer = singer;
     }
 }

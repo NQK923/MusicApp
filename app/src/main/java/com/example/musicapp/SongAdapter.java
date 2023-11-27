@@ -38,31 +38,33 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         SongViewHolder viewHolder = (SongViewHolder) holder;
 
         viewHolder.titleHolder.setText(song.getTitle());
-        viewHolder.durationHolder.setText(String.valueOf(song.getDuration()));
-        viewHolder.pathHolder.setText(String.valueOf(song.getPath()));
+        viewHolder.durationHolder.setText(getDuration(song.getDuration()));
+        viewHolder.singerHolder.setText(song.getSinger());
+        viewHolder.albumHolder.setText(song.getAlbum());
 
         Uri artworkUri = song.getArtworkUri();
 
-        if (artworkUri!=null){
+        if (artworkUri != null) {
             viewHolder.artworkHolder.setImageURI(artworkUri);
-            if (viewHolder.artworkHolder.getDrawable()==null){
+            if (viewHolder.artworkHolder.getDrawable() == null) {
                 viewHolder.artworkHolder.setImageResource(R.drawable.default_artwork);
             }
         }
 
-        viewHolder.itemView.setOnClickListener(view -> Toast.makeText(context,song.getTitle(),Toast.LENGTH_SHORT).show());
+        viewHolder.itemView.setOnClickListener(view -> Toast.makeText(context, song.getTitle(), Toast.LENGTH_SHORT).show());
     }
 
     public static class SongViewHolder extends RecyclerView.ViewHolder {
         ImageView artworkHolder;
-        TextView titleHolder, durationHolder, pathHolder;
+        TextView titleHolder, durationHolder, singerHolder, albumHolder;
 
         public SongViewHolder(@NonNull View itemView) {
             super(itemView);
             artworkHolder = itemView.findViewById(R.id.artworkView);
             titleHolder = itemView.findViewById(R.id.titleView);
             durationHolder = itemView.findViewById((R.id.durationView));
-            pathHolder = itemView.findViewById((R.id.pathView));
+            singerHolder = itemView.findViewById((R.id.singerView));
+            albumHolder = itemView.findViewById(R.id.albumView);
 
         }
     }
@@ -73,8 +75,23 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void filterSongs(List<Song> filtedList){
-        songs=filtedList;
+    public void filterSongs(List<Song> filtedList) {
+        songs = filtedList;
         notifyDataSetChanged();
+    }
+
+    private String getDuration(int totalDuration) {
+
+        String totalDurationText;
+        int sec = totalDuration / 1000;
+        int hrs = sec / 3600;
+        int min = (sec % 3600) / 60;
+        sec = sec % 60;
+        if ((hrs < 1)) {
+            totalDurationText = String.format("%02d:%02d", min, sec);
+        } else {
+            totalDurationText = String.format("%02d:%02d:%02d", hrs, min, sec);
+        }
+        return totalDurationText;
     }
 }
