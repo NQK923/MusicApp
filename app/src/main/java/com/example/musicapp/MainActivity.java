@@ -25,6 +25,8 @@ import android.view.MenuItem;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Toast;
 
+import com.google.android.exoplayer2.ExoPlayer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     ActivityResultLauncher<String> storagePermissionLauncher;
     final String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
 
-
+    ExoPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +61,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         storagePermissionLauncher.launch(permission);
+
+        player = new ExoPlayer.Builder(this).build();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (player.isPlaying()){
+            player.stop();
+        }
+        player.release();
     }
 
     private void userReponses() {
@@ -145,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager((layoutManager));
 
-        songAdapter = new SongAdapter(this, songs);
+        songAdapter = new SongAdapter(this, songs,player);
 
         recyclerView.setAdapter(songAdapter);
 
