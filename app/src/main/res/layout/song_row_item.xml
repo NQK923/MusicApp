@@ -43,9 +43,25 @@
                 android:textColor="@color/white">
             </TextView>
             <TextView
-                android:layout_width=""
-                android:layout_height=""
+                android:id="@+id/durationView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/artworkView"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="00:00"
+                android:layout_marginBottom="@dimen/xx_sm"
+                android:layout_marginStart="@dimen/sm"
             ></TextView>
+            <TextView
+                android:id="@+id/pathView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/durationView"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="Nothing"
+                android:layout_marginBottom="@dimen/xx_sm"
+                android:layout_marginStart="@dimen/lg"
+                ></TextView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
