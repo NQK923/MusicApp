@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.exoplayer2.ExoPlayer;
@@ -26,10 +27,13 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     List<Song> songs;
     ExoPlayer player;
 
-    public SongAdapter(Context context, List<Song> songs, ExoPlayer player) {
+    ConstraintLayout playerView;
+
+    public SongAdapter(Context context, List<Song> songs, ExoPlayer player, ConstraintLayout playerView) {
         this.context = context;
         this.songs = songs;
         this.player = player;
+        this.playerView = playerView;
     }
 
     @NonNull
@@ -68,6 +72,8 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             player.prepare();
             player.play();
             Toast.makeText(context, song.getTitle(), Toast.LENGTH_SHORT).show();
+
+            playerView.setVisibility(View.VISIBLE);
         });
     }
 
@@ -111,7 +117,6 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     private String getDuration(int totalDuration) {
-
         String totalDurationText;
         int sec = totalDuration / 1000;
         int hrs = sec / 3600;

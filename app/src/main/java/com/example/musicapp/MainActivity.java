@@ -1,18 +1,6 @@
 package com.example.musicapp;
 
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.ColorUtils;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentUris;
@@ -31,8 +19,22 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.chibde.visualizer.BarVisualizer;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.Player;
 import com.jgabrielfreitas.core.BlurImageView;
 
 import java.util.ArrayList;
@@ -121,6 +123,47 @@ public class MainActivity extends AppCompatActivity {
         playlistBtn.setOnClickListener(view -> exitPlayerView());
 
         homeControlWrapper.setOnClickListener(view -> showPlayerView());
+
+        player.addListener(new Player.Listener() {
+            @Override
+            public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
+                Player.Listener.super.onMediaItemTransition(mediaItem, reason);
+
+                songNameView.setText(mediaItem.mediaMetadata.title);
+                homeSongNameView.setText(mediaItem.mediaMetadata.title);
+
+                progressView.setText((getReadableTime((int) player.getCurrentPosition())));
+                seekBar.setProgress((int) player.getCurrentPosition());
+                seekBar.setMax((int) player.getDuration());
+                durationView.setText(getReadableTime((int) player.getDuration()));
+                playPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_outline_pause,0,0,0);
+                homePlayPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pause,0,0,0);
+
+                showCurrentArtWork();
+            }
+        });
+    }
+
+    private void showCurrentArtWork() {
+        artworkView.setImageURI(Objects.requireNonNull(player.getCurrentMediaItem().mediaMetadata.artworkUri));
+
+        if (artworkView.getDrawable()==null){
+            artworkView.setImageResource(R.drawable.default_artwork);
+        }
+    }
+
+    private String getReadableTime(int currentPosition) {
+        String totalDurationText;
+        int sec = currentPosition / 1000;
+        int hrs = sec / 3600;
+        int min = (sec % 3600) / 60;
+        sec = sec % 60;
+        if ((hrs < 1)) {
+            totalDurationText = String.format("%02d:%02d", min, sec);
+        } else {
+            totalDurationText = String.format("%02d:%02d:%02d", hrs, min, sec);
+        }
+        return totalDurationText;
     }
 
     private void showPlayerView() {
@@ -134,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
     private void exitPlayerView() {
         playerView.setVisibility(View.GONE);
         getWindow().setStatusBarColor(defaultStatusColor);
-        getWindow().setNavigationBarColor(ColorUtils.setAlphaComponent(defaultStatusColor,199));
+        getWindow().setNavigationBarColor(ColorUtils.setAlphaComponent(defaultStatusColor, 199));
     }
 
     private void initView() {
@@ -160,13 +203,13 @@ public class MainActivity extends AppCompatActivity {
         seekbarWrapper = findViewById(R.id.seekbarWrapper);
         audioVisualizerWrapper = findViewById(R.id.audioVisualizerWrapper);
 
-        artworkView =findViewById(R.id.artworkView);
+        artworkView = findViewById(R.id.artworkView);
 
-        seekBar =findViewById(R.id.seekbar);
-        progressView =findViewById(R.id.progressView);
-        durationView =findViewById(R.id.durationView);
+        seekBar = findViewById(R.id.seekbar);
+        progressView = findViewById(R.id.progressView);
+        durationView = findViewById(R.id.durationView);
 
-        audioVisualizer =findViewById(R.id.visualizer);
+        audioVisualizer = findViewById(R.id.visualizer);
 
         blurImageView = findViewById(R.id.bluerImageView);
 
@@ -289,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager((layoutManager));
 
-        songAdapter = new SongAdapter(this, songs, player);
+        songAdapter = new SongAdapter(this, songs, player, playerView);
 
         recyclerView.setAdapter(songAdapter);
 
