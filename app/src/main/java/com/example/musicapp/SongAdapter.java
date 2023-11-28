@@ -1,7 +1,9 @@
 package com.example.musicapp;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.exoplayer2.ExoPlayer;
@@ -74,6 +77,10 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             Toast.makeText(context, song.getTitle(), Toast.LENGTH_SHORT).show();
 
             playerView.setVisibility(View.VISIBLE);
+
+            if ((ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO))!= PackageManager.PERMISSION_GRANTED){
+                ((MainActivity)context).recordAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO);
+            }
         });
     }
 

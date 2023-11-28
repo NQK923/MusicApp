@@ -10,11 +10,15 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -136,18 +140,162 @@ public class MainActivity extends AppCompatActivity {
                 seekBar.setProgress((int) player.getCurrentPosition());
                 seekBar.setMax((int) player.getDuration());
                 durationView.setText(getReadableTime((int) player.getDuration()));
-                playPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_outline_pause,0,0,0);
-                homePlayPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pause,0,0,0);
+                playPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_outline_pause, 0, 0, 0);
+                homePlayPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pause, 0, 0, 0);
 
                 showCurrentArtWork();
+
+                updatePlayerPositionProgress();
+
+                artworkView.setAnimation(loadRotation());
+
+                activateAudioVisualizer();
+
+                updatePlayerColor();
+
+                if (!player.isPlaying()) {
+                    player.play();
+                }
+            }
+
+            @Override
+            public void onPlaybackStateChanged(int playbackState) {
+                Player.Listener.super.onPlaybackStateChanged(playbackState);
+                if (playbackState == ExoPlayer.STATE_READY) {
+                    songNameView.setText((player.getCurrentMediaItem().mediaMetadata.title));
+                    homeSongNameView.setText((player.getCurrentMediaItem().mediaMetadata.title));
+                    progressView.setText((getReadableTime((int) player.getCurrentPosition())));
+                    durationView.setText((getReadableTime((int) player.getDuration())));
+                    seekBar.setMax((int) player.getDuration());
+                    seekBar.setProgress((int) player.getCurrentPosition());
+                    playPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_outline_pause, 0, 0, 0);
+                    homePlayPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pause, 0, 0, 0);
+
+                    showCurrentArtWork();
+
+                    updatePlayerPositionProgress();
+
+                    artworkView.setAnimation(loadRotation());
+
+                    activateAudioVisualizer();
+
+                    updatePlayerColor();
+                } else {
+                    playPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_outline, 0, 0, 0);
+                    homePlayPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_play_, 0, 0, 0);
+                }
             }
         });
+
+        skipNextBtn.setOnClickListener(view -> skipNextSong());
+        homeSkipNextbtn.setOnClickListener(view -> skipNextSong());
+
+        skipPreBtn.setOnClickListener(view -> skipPreSong());
+        homeSkipPreBtn.setOnClickListener(view -> skipPreSong());
+
+        playPauseBtn.setOnClickListener(view -> playOrPausePlayer());
+        homePlayPauseBtn.setOnClickListener(view -> playOrPausePlayer());
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int progressValue = 0;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progressValue = seekBar.getProgress();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if (player.getPlaybackState() == ExoPlayer.STATE_READY) {
+                    seekBar.setProgress((progressValue));
+                    progressView.setText((getReadableTime(progressValue)));
+                    player.seekTo(progressValue);
+                }
+            }
+        });
+
+        repeatModeBtn.setOnClickListener(view -> {
+            if ((repeatMode == 1)) {
+                player.setRepeatMode(ExoPlayer.REPEAT_MODE_ONE);
+                repeatMode = 2;
+                repeatModeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_one, 0, 0, 0);
+            } else if (repeatMode == 2) {
+                player.setShuffleModeEnabled(true);
+                player.setRepeatMode(ExoPlayer.REPEAT_MODE_ALL);
+                repeatMode = 3;
+                repeatModeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shuffle, 0, 0, 0);
+            } else if (repeatMode == 3) {
+                player.setRepeatMode(ExoPlayer.REPEAT_MODE_ALL);
+                player.setShuffleModeEnabled(false);
+                repeatMode = 1;
+                repeatModeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat, 0, 0, 0);
+            }
+        });
+        updatePlayerColor();
+    }
+
+    private void playOrPausePlayer() {
+        if (player.isPlaying()) {
+            player.pause();
+            playPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_circle_outline, 0, 0, 0);
+            homePlayPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_play_, 0, 0, 0);
+            artworkView.clearAnimation();
+        } else {
+            player.play();
+            playPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_outline_pause, 0, 0, 0);
+            homePlayPauseBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pause, 0, 0, 0);
+            artworkView.startAnimation(loadRotation());
+        }
+        updatePlayerColor();
+
+    }
+
+    private void skipPreSong() {
+        if (player.hasPreviousMediaItem()) {
+            player.seekToPrevious();
+        } else {
+            player.seekTo(player.getMediaItemCount() - 1, 0);
+        }
+    }
+
+    private void skipNextSong() {
+        if (player.hasNextMediaItem()) {
+            player.seekToNext();
+        } else {
+            player.seekTo(0, 0);
+        }
+    }
+
+    private Animation loadRotation() {
+        RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotateAnimation.setInterpolator(new LinearInterpolator());
+        rotateAnimation.setDuration(10000);
+        rotateAnimation.setRepeatCount(Animation.INFINITE);
+        return rotateAnimation;
+    }
+
+    private void updatePlayerPositionProgress() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (player.isPlaying()) {
+                    progressView.setText((getReadableTime((int) player.getCurrentPosition())));
+                    seekBar.setProgress((int) player.getCurrentPosition());
+                }
+                updatePlayerPositionProgress();
+            }
+        }, 1000);
     }
 
     private void showCurrentArtWork() {
         artworkView.setImageURI(Objects.requireNonNull(player.getCurrentMediaItem().mediaMetadata.artworkUri));
 
-        if (artworkView.getDrawable()==null){
+        if (artworkView.getDrawable() == null) {
             artworkView.setImageResource(R.drawable.default_artwork);
         }
     }
