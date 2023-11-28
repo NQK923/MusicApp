@@ -34,7 +34,7 @@
             android:layout_height="match_parent"
             android:paddingHorizontal="@dimen/md"
             app:drawableStartCompat="@drawable/ic_arrow_back"
-            app:layout_constraintStart_toStartOf="parent"></TextView>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/songNameView"
@@ -48,7 +48,7 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.1"
-            app:layout_constraintStart_toEndOf="@id/playerCloseBtn"></TextView>
+            app:layout_constraintStart_toEndOf="@id/playerCloseBtn" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -68,7 +68,7 @@
             android:src="@drawable/default_artwork"
             app:civ_border_color="?attr/colorPrimary"
             app:civ_border_overlay="true"
-            app:civ_border_width="2dp"></de.hdodenhof.circleimageview.CircleImageView>
+            app:civ_border_width="2dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -89,7 +89,7 @@
             android:progressTint="@color/secondary_color"
             android:thumb="@drawable/seek_thumb"
             app:layout_constraintBottom_toTopOf="@id/durationView"
-            app:layout_constraintTop_toTopOf="parent"></SeekBar>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/progressView"
@@ -101,8 +101,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/seekbar"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="10dp"
-            ></TextView>
+            android:layout_marginStart="10dp" />
 
         <TextView
             android:id="@+id/durationView"
@@ -112,7 +111,7 @@
             android:text="00:00"
             android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/seekbar"></TextView>
+            app:layout_constraintTop_toBottomOf="@id/seekbar" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -134,7 +133,7 @@
             app:drawableStartCompat="@drawable/ic_repeat"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></TextView>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/skipPreBtn"
@@ -145,7 +144,7 @@
             app:drawableStartCompat="@drawable/ic_skip_previous"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/playPauseBtn"
-            app:layout_constraintTop_toTopOf="parent"></TextView>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/playPauseBtn"
@@ -156,7 +155,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></TextView>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/skipNextBtn"
@@ -167,7 +166,7 @@
             app:drawableStartCompat="@drawable/ic_skip_next"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/playPauseBtn"
-            app:layout_constraintTop_toTopOf="parent"></TextView>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/playlistBtn"
@@ -177,7 +176,7 @@
             app:drawableStartCompat="@drawable/ic_playlist"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></TextView>
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -191,7 +190,7 @@
         <com.chibde.visualizer.LineBarVisualizer
             android:id="@+id/visualizer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></com.chibde.visualizer.LineBarVisualizer>
+            android:layout_height="match_parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
