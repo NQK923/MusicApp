@@ -39,10 +39,10 @@ dependencies {
 
     implementation("jp.wasabeef:recyclerview-animators:4.0.2")
     implementation("androidx.palette:palette:1.0.0")
-    //implementation("io.github.gautanchibde:audiovisualizer:2.2.5")
+    implementation("io.github.gautamchibde:audiovisualizer:2.2.5")
     implementation("com.google.android.exoplayer:exoplayer:2.19.1")
     implementation("de.hdodenhof:circleimageview:3.1.0")
-    //implementation ("com.github.jgabrielfreitas:BlurImageView:1.0.1")
+    implementation ("com.github.jgabrielfreitas:BlurImageView:1.0.1")
 
 
 }

@@ -57,20 +57,54 @@
             android:id="@+id/homeSongNameView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/icAudio"
-            app:layout_constraintStart_toEndOf="@id/icAudio"
-            android:text="Song playing"
-            app:layout_constraintWidth_percent="0.6"
             android:ellipsize="marquee"
-            android:maxLines="1"
             android:marqueeRepeatLimit="marquee_forever"
+            android:maxLines="1"
+            android:text="Song playing"
             android:textColor="@color/white"
-            app:layout_constraintHorizontal_bias="0"
             android:textStyle="bold"
-            >
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/icAudio"
+            app:layout_constraintTop_toTopOf="@id/icAudio"
+            app:layout_constraintWidth_percent="0.6"></TextView>
+
+        <TextView
+            android:id="@+id/homeSkipPreBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:drawableStartCompat="@drawable/ic_skip_previous"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/homePlayPauseBtn"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.1">
 
         </TextView>
 
+        <TextView
+            android:id="@+id/homePlayPauseBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:drawableStartCompat="@drawable/ic_play_"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/homeSongNameView"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.1"></TextView>
+
+        <TextView
+            android:id="@+id/homeSkipNextBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:drawableStartCompat="@drawable/ic_skip_next"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/homePlayPauseBtn"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.1">
+
+        </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include layout="@layout/player_view"></include>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
