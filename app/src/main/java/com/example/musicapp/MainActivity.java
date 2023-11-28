@@ -7,6 +7,8 @@ import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +34,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
+import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -320,6 +323,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updatePlayerColor() {
+        if (playerView.getVisibility()==View.GONE){
+            return;
+        }
+
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) artworkView.getDrawable();
+        if (bitmapDrawable == null) {
+            bitmapDrawable = (BitmapDrawable) ContextCompat.getDrawable(this, R.drawable.default_artwork);
+        }
+        assert bitmapDrawable != null;
+        Bitmap bitmap = bitmapDrawable.getBitmap();
+
+        blurImageView.setImageBitmap(bitmap);
+        blurImageView.setBlur(4);
+
+        Palette.from(bitmap).generate(palette -> {
+            if (palette != null) {
+                Palette.Swatch swatch = palette.getDarkVibrantSwatch();
+                if (swatch == null) {
+                    swatch = palette.getMutedSwatch();
+                    if (swatch == null) {
+                        swatch = palette.getDominantSwatch();
+                    }
+                }
+
+                int titleTextColor = swatch.getTitleTextColor();
+                int bodyTextColor = swatch.getBodyTextColor();
+                int rgb = swatch.getRgb();
+
+                getWindow().setStatusBarColor(rgb);
+                getWindow().setNavigationBarColor(rgb);
+
+
+                songNameView.setTextColor(titleTextColor);
+                playerCloseBtn.getCompoundDrawables()[0].setTint(titleTextColor);
+                progressView.setTextColor(bodyTextColor);
+                durationView.setTextColor(bodyTextColor);
+            }
+        });
+
     }
 
     private void exitPlayerView() {
