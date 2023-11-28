@@ -39,6 +39,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chibde.visualizer.BarVisualizer;
+import com.chibde.visualizer.CircleBarVisualizer;
+import com.chibde.visualizer.CircleBarVisualizerSmooth;
+import com.chibde.visualizer.CircleVisualizer;
+import com.chibde.visualizer.LineBarVisualizer;
+import com.chibde.visualizer.LineVisualizer;
+import com.chibde.visualizer.SquareBarVisualizer;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
@@ -76,11 +82,15 @@ public class MainActivity extends AppCompatActivity {
     SeekBar seekBar;
     TextView progressView, durationView;
 
-    BarVisualizer audioVisualizer;
+    LineBarVisualizer audioVisualizer;
 
     BlurImageView blurImageView;
 
     int defaultStatusColor;
+
+    int bodyTextColor;
+
+    int rgb;
 
     int repeatMode = 1;
 
@@ -323,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updatePlayerColor() {
-        if (playerView.getVisibility()==View.GONE){
+        if (playerView.getVisibility() == View.GONE) {
             return;
         }
 
@@ -348,8 +358,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 int titleTextColor = swatch.getTitleTextColor();
-                int bodyTextColor = swatch.getBodyTextColor();
-                int rgb = swatch.getRgb();
+                bodyTextColor = swatch.getBodyTextColor();
+                rgb = swatch.getRgb();
 
                 getWindow().setStatusBarColor(rgb);
                 getWindow().setNavigationBarColor(rgb);
@@ -359,6 +369,12 @@ public class MainActivity extends AppCompatActivity {
                 playerCloseBtn.getCompoundDrawables()[0].setTint(titleTextColor);
                 progressView.setTextColor(bodyTextColor);
                 durationView.setTextColor(bodyTextColor);
+
+                repeatModeBtn.getCompoundDrawables()[0].setTint(bodyTextColor);
+                skipPreBtn.getCompoundDrawables()[0].setTint(bodyTextColor);
+                skipNextBtn.getCompoundDrawables()[0].setTint(bodyTextColor);
+                playPauseBtn.getCompoundDrawables()[0].setTint(bodyTextColor);
+                playlistBtn.getCompoundDrawables()[0].setTint(bodyTextColor);
             }
         });
 
@@ -427,6 +443,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void activateAudioVisualizer() {
+        if ((ContextCompat.checkSelfPermission(this, recordAudioPer)) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        audioVisualizer.setColor(bodyTextColor);
+        audioVisualizer.setPlayer(player.getAudioSessionId());
+        audioVisualizer.setDensity(144);
     }
 
     @Override
@@ -516,7 +538,7 @@ public class MainActivity extends AppCompatActivity {
         allSongs.clear();
         allSongs.addAll(songs);
 
-        String title = getResources().getString(R.string.app_name) + " - " + songs.size();
+        String title = getResources().getString(R.string.app_name);
         Objects.requireNonNull(getSupportActionBar()).setTitle(title);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);

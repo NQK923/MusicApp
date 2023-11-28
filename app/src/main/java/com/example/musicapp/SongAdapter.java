@@ -66,6 +66,7 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         viewHolder.itemView.setOnClickListener(view -> {
+            playerView.setVisibility(View.VISIBLE);
             if (!player.isPlaying()) {
                 player.setMediaItems(getMediaItems(), position, 0);
             } else {
@@ -75,11 +76,8 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             player.prepare();
             player.play();
             Toast.makeText(context, song.getTitle(), Toast.LENGTH_SHORT).show();
-
-            playerView.setVisibility(View.VISIBLE);
-
-            if ((ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO))!= PackageManager.PERMISSION_GRANTED){
-                ((MainActivity)context).recordAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO);
+            if ((ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)) != PackageManager.PERMISSION_GRANTED) {
+                ((MainActivity) context).recordAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO);
             }
         });
     }
