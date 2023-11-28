@@ -3,8 +3,12 @@ package com.example.musicapp;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -13,6 +17,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,13 +43,7 @@ import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.chibde.visualizer.BarVisualizer;
-import com.chibde.visualizer.CircleBarVisualizer;
-import com.chibde.visualizer.CircleBarVisualizerSmooth;
-import com.chibde.visualizer.CircleVisualizer;
 import com.chibde.visualizer.LineBarVisualizer;
-import com.chibde.visualizer.LineVisualizer;
-import com.chibde.visualizer.SquareBarVisualizer;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
@@ -94,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
 
     int repeatMode = 1;
 
+    boolean isBond = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
+        Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.app_name));
 
         recyclerView = findViewById(R.id.recyclerview);
         storagePermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
@@ -127,9 +128,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         player = new ExoPlayer.Builder(this).build();
+
         initView();
 
         playerControl();
+
     }
 
     private void playerControl() {
@@ -146,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
                 Player.Listener.super.onMediaItemTransition(mediaItem, reason);
 
-                songNameView.setText(mediaItem.mediaMetadata.title);
+                songNameView.setText(Objects.requireNonNull(mediaItem).mediaMetadata.title);
                 homeSongNameView.setText(mediaItem.mediaMetadata.title);
 
                 progressView.setText((getReadableTime((int) player.getCurrentPosition())));
@@ -175,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
             public void onPlaybackStateChanged(int playbackState) {
                 Player.Listener.super.onPlaybackStateChanged(playbackState);
                 if (playbackState == ExoPlayer.STATE_READY) {
-                    songNameView.setText((player.getCurrentMediaItem().mediaMetadata.title));
+                    songNameView.setText((Objects.requireNonNull(player.getCurrentMediaItem()).mediaMetadata.title));
                     homeSongNameView.setText((player.getCurrentMediaItem().mediaMetadata.title));
                     progressView.setText((getReadableTime((int) player.getCurrentPosition())));
                     durationView.setText((getReadableTime((int) player.getDuration())));
@@ -458,6 +461,16 @@ public class MainActivity extends AppCompatActivity {
             player.stop();
         }
         player.release();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (playerView.getVisibility() == View.VISIBLE) {
+            exitPlayerView();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void userReponses() {
