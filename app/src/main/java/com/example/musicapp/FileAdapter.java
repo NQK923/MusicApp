@@ -26,7 +26,6 @@ public class FileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.itemClickListener = itemClickListener;
     }
 
-
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -53,7 +52,6 @@ public class FileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     String path = selectedFile.getPath();
                     itemClickListener.onItemClick(path);
                 }
-
             }
         });
     }

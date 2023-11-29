@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -26,11 +27,11 @@ import java.io.File;
 public class FileListActivity extends AppCompatActivity {
 
     final String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+
+    final String permissionWrite = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     ActivityResultLauncher<String> storagePermissionLauncher;
     RecyclerView recyclerView;
     TextView noFileText;
-
-
     File[] filesAndFolders;
     private File root;
 
@@ -41,20 +42,27 @@ public class FileListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_file_list);
         recyclerView = findViewById(R.id.recycler_view);
         noFileText = findViewById(R.id.nofiles_Textview);
+        storagePermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+            if (granted) {
+                fetchFiles();
+            } else {
+                userReponses();
+            }
+        });
+        storagePermissionLauncher.launch(permissionWrite);
 
-        userReponses();
     }
 
     private void userReponses() {
-        if ((ContextCompat.checkSelfPermission(this, permission)) == PackageManager.PERMISSION_GRANTED) {
+        if ((ContextCompat.checkSelfPermission(this, permissionWrite)) == PackageManager.PERMISSION_GRANTED) {
             fetchFiles();
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if ((shouldShowRequestPermissionRationale(permission))) {
+            if ((shouldShowRequestPermissionRationale(permissionWrite))) {
                 new AlertDialog.Builder(this)
                         .setTitle("Yêu cầu cấp quyền bộ nhớ").setMessage("Cấp quyền để tiến hành đọc bộ nhớ thiết bị!").setPositiveButton("Chấp nhận", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                storagePermissionLauncher.launch(permission);
+                                storagePermissionLauncher.launch(permissionWrite);
                             }
                         }).setNegativeButton("Từ chối", new DialogInterface.OnClickListener() {
                             @Override
@@ -67,6 +75,7 @@ public class FileListActivity extends AppCompatActivity {
             Toast.makeText(this, "Bạn từ chối sử dụng ứng dụng!!!", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void fetchFiles() {
         String path = null;
