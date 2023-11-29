@@ -41,13 +41,14 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/soft_red"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/icAudio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/sm"
+            android:paddingEnd="6dp"
             app:drawableStartCompat="@drawable/ic_audiotrack_"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +61,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="marquee"
             android:marqueeRepeatLimit="marquee_forever"
-            android:maxLines="1"
+            android:maxLines="2"
             android:text="Song playing"
             android:textColor="@color/white"
             android:textStyle="bold"
@@ -68,7 +69,7 @@
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/icAudio"
             app:layout_constraintTop_toTopOf="@id/icAudio"
-            app:layout_constraintWidth_percent="0.6" />
+            app:layout_constraintWidth_percent="0.45" />
 
         <TextView
             android:id="@+id/homeSkipPreBtn"
@@ -100,6 +101,17 @@
             app:drawableStartCompat="@drawable/ic_skip_next"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/homePlayPauseBtn"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.1">
+
+        </TextView>
+        <TextView
+            android:id="@+id/homeCloseBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:drawableStartCompat="@drawable/ic_close"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/homeSkipNextBtn"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.1">
 

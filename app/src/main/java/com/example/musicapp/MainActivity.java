@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -51,6 +52,7 @@ import com.jgabrielfreitas.core.BlurImageView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
@@ -71,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     TextView playerCloseBtn;
 
     TextView songNameView, skipPreBtn, skipNextBtn, playPauseBtn, repeatModeBtn, playlistBtn;
-    TextView homeSongNameView, homeSkipPreBtn, homePlayPauseBtn, homeSkipNextbtn;
+    TextView homeSongNameView, homeSkipPreBtn, homePlayPauseBtn, homeSkipNextbtn, homeCloseBtn;
 
     ConstraintLayout homeControlWrapper, headWrapper, artworkWrapper, seekbarWrapper, controlWrapper, audioVisualizerWrapper;
 
@@ -119,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         storagePermissionLauncher.launch(permission);
-
         recordAudioPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
             if (granted && player.isPlaying()) {
                 activateAudioVisualizer();
@@ -213,6 +214,8 @@ public class MainActivity extends AppCompatActivity {
         playPauseBtn.setOnClickListener(view -> playOrPausePlayer());
         homePlayPauseBtn.setOnClickListener(view -> playOrPausePlayer());
 
+        homeCloseBtn.setOnClickListener(view-> closeHomeMenu());
+
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int progressValue = 0;
 
@@ -254,6 +257,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         updatePlayerColor();
+    }
+
+    private void closeHomeMenu() {
+        homeControlWrapper.setVisibility(View.GONE);
+        player.stop();
     }
 
     private void playOrPausePlayer() {
@@ -304,8 +312,15 @@ public class MainActivity extends AppCompatActivity {
                     progressView.setText((getReadableTime((int) player.getCurrentPosition())));
                     seekBar.setProgress((int) player.getCurrentPosition());
                 }
-                if (player.getCurrentPosition()==player.getDuration()){
-                    skipNextSong();
+                if (player.getCurrentPosition() == player.getDuration()) {
+                    if (repeatMode == 2) {
+                        player.seekTo(0);
+                    } else if (repeatMode == 3) {
+                        Random random = new Random();
+                        int randomPosition = random.nextInt(allSongs.size() + 1);
+                    } else {
+                        skipNextSong();
+                    }
                 }
                 updatePlayerPositionProgress();
             }
@@ -364,13 +379,22 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                int titleTextColor = swatch.getTitleTextColor();
+                assert swatch != null;
+                int titleTextColor;
                 bodyTextColor = swatch.getBodyTextColor();
                 rgb = swatch.getRgb();
+                float[] hsv = new float[3];
+                Color.colorToHSV(rgb, hsv);
+                if (hsv[2] < 0.5) {
+                    titleTextColor = Color.WHITE;
+                    bodyTextColor = Color.WHITE;
+                } else {
+                    titleTextColor = Color.BLACK;
+                    bodyTextColor = Color.BLACK;
+                }
 
                 getWindow().setStatusBarColor(rgb);
                 getWindow().setNavigationBarColor(rgb);
-
 
                 songNameView.setTextColor(titleTextColor);
                 playerCloseBtn.getCompoundDrawables()[0].setTint(titleTextColor);
@@ -389,6 +413,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void exitPlayerView() {
         playerView.setVisibility(View.GONE);
+        homeControlWrapper.setVisibility(View.VISIBLE);
         getWindow().setStatusBarColor(defaultStatusColor);
         getWindow().setNavigationBarColor(ColorUtils.setAlphaComponent(defaultStatusColor, 199));
     }
@@ -408,6 +433,7 @@ public class MainActivity extends AppCompatActivity {
         homeSkipNextbtn = findViewById(R.id.homeSkipNextBtn);
         homeSkipPreBtn = findViewById(R.id.homeSkipPreBtn);
         homePlayPauseBtn = findViewById(R.id.homePlayPauseBtn);
+        homeCloseBtn = findViewById((R.id.homeCloseBtn));
 
         homeControlWrapper = findViewById(R.id.homeControlWrapper);
         artworkWrapper = findViewById(R.id.artwordWrapper);
