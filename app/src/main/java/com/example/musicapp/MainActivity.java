@@ -301,6 +301,9 @@ public class MainActivity extends AppCompatActivity {
                     progressView.setText((getReadableTime((int) player.getCurrentPosition())));
                     seekBar.setProgress((int) player.getCurrentPosition());
                 }
+                if (player.getCurrentPosition()==player.getDuration()){
+                    skipNextSong();
+                }
                 updatePlayerPositionProgress();
             }
         }, 1000);
