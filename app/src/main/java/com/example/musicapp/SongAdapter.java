@@ -3,7 +3,6 @@ package com.example.musicapp;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -67,7 +66,6 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         viewHolder.itemView.setOnClickListener(view -> {
-
             playerView.setVisibility(View.VISIBLE);
             if (!player.isPlaying()) {
                 player.setMediaItems(getMediaItems(), position, 0);

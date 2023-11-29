@@ -20,7 +20,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/secondary_color"
+            android:background="@color/soft_red"
             app:menu="@menu/search_btn"
             app:titleTextColor="@color/white" />
     </com.google.android.material.appbar.AppBarLayout>
@@ -30,6 +30,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:paddingBottom="@dimen/x_sm"
+        android:background="@color/background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +40,7 @@
         android:id="@+id/homeControlWrapper"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="@color/soft_red"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView

@@ -5,6 +5,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -12,8 +13,10 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -492,8 +495,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchSongs() {
+        String path = null;
+        Intent intent = getIntent();
+        if (intent != null) {
+            path = intent.getStringExtra("path");
+        }
         List<Song> songs = new ArrayList<>();
         Uri mediaStoreUri;
+        String newPath = path.replaceFirst("/storage/emulated/0", "");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             mediaStoreUri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
@@ -511,7 +520,10 @@ public class MainActivity extends AppCompatActivity {
         };
 
         String sortOrder = MediaStore.Audio.Media.TITLE;
-        try (Cursor cursor = getContentResolver().query(mediaStoreUri, projection, null, null, sortOrder)) {
+        String selection = MediaStore.Audio.Media.DATA + " like ? ";
+        String[] selectionArgs = new String[]{"%" + newPath + "/%"};
+        Log.i("Test", path);
+        try (Cursor cursor = getContentResolver().query(mediaStoreUri, projection, selection, selectionArgs, sortOrder)) {
             int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
             int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
             int duationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION);

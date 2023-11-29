@@ -3,6 +3,7 @@ package com.example.musicapp;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,15 +25,21 @@ public class FileListActivity extends AppCompatActivity {
 
     final String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
     ActivityResultLauncher<String> storagePermissionLauncher;
-    RecyclerView recyclerView = findViewById(R.id.recyclerview);
-    TextView noFileText = findViewById(R.id.nofiles_Textview);
+    RecyclerView recyclerView;
+    TextView noFileText;
+
+
+    File[] filesAndFolders;
+    private File root;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_list);
-        userReponses();
+        recyclerView = findViewById(R.id.recycler_view);
+        noFileText = findViewById(R.id.nofiles_Textview);
 
+        userReponses();
     }
 
     private void userReponses() {
@@ -59,10 +66,18 @@ public class FileListActivity extends AppCompatActivity {
     }
 
     private void fetchFiles() {
-        String path = Environment.getExternalStorageDirectory().getPath();
+        String path = null;
+        Intent intent = getIntent();
+        if (intent != null) {
+            path = intent.getStringExtra("path");
+        }
+        if (path == null) {
+            path = Environment.getExternalStorageDirectory().getPath();
+        }
 
         File root = new File(path);
-        File[] filesAndFolders = root.listFiles();
+        filesAndFolders = root.listFiles();
+
         if (filesAndFolders == null) {
             noFileText.setVisibility(View.VISIBLE);
             return;
@@ -70,6 +85,45 @@ public class FileListActivity extends AppCompatActivity {
 
         noFileText.setVisibility(View.INVISIBLE);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new FileAdapter(getApplicationContext(), filesAndFolders));
+        FileAdapter fileAdapter = new FileAdapter(this, filesAndFolders, new FileAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(String path) {
+                new AlertDialog.Builder(FileListActivity.this)
+                        .setTitle("Lựa chọn").setMessage("Bạn muốn mở thư mục hay phát toàn bộ nhạc trong thư mục đã chọn?")
+                        .setPositiveButton("Mở thư mục", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(FileListActivity.this, FileListActivity.class);
+                                intent.putExtra("path", path);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            }
+                        }).setNegativeButton("Phát nhạc", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(FileListActivity.this, MainActivity.class);
+                                intent.putExtra("path", path);
+                                startActivity(intent);
+                            }
+                        }).show();
+            }
+        });
+        recyclerView.setAdapter(fileAdapter);
+    }
+
+    private void userChoise(String path) {
+        new AlertDialog.Builder(this)
+                .setTitle("Lựa chọn").setMessage("Bạn muốn mở thư mục hay phát toàn bộ nhạc trong thư mục đã chọn?")
+                .setPositiveButton("Mở thư mục", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).setNegativeButton("Phát nhạc", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
     }
 }

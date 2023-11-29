@@ -6,4 +6,6 @@
     <color name="primary_color_variant">#D50500</color>
     <color name="secondary_color">#EE9017</color>
     <color name="secondary_variant">#b3750D</color>
+    <color name="background">#E9E2A6</color>
+    <color name="soft_red">#DC6259</color>
 </resources>
