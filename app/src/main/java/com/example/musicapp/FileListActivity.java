@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,8 +80,8 @@ public class FileListActivity extends AppCompatActivity {
 
         File root = new File(path);
         filesAndFolders = root.listFiles();
-
-        if (filesAndFolders == null) {
+        Log.i("FileSize", filesAndFolders.length + " fetchFiles: ");
+        if (filesAndFolders.length == 0) {
             noFileText.setVisibility(View.VISIBLE);
             return;
         }
@@ -111,21 +112,5 @@ public class FileListActivity extends AppCompatActivity {
             }
         });
         recyclerView.setAdapter(fileAdapter);
-    }
-
-    private void userChoise(String path) {
-        new AlertDialog.Builder(this)
-                .setTitle("Lựa chọn").setMessage("Bạn muốn mở thư mục hay phát toàn bộ nhạc trong thư mục đã chọn?")
-                .setPositiveButton("Mở thư mục", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                }).setNegativeButton("Phát nhạc", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                }).show();
     }
 }

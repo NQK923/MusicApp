@@ -50,9 +50,10 @@ public class FileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             @Override
             public void onClick(View v) {
                 if (selectedFile.isDirectory()) {
+                    String path = selectedFile.getPath();
+                    itemClickListener.onItemClick(path);
                 }
-                String path = selectedFile.getPath();
-                itemClickListener.onItemClick(path);
+
             }
         });
     }
