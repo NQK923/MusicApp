@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <style name="Theme.SplashTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/black</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/default_artwork</item>
+    <item name="postSplashScreenTheme">@style/Theme.MusicApp</item>
+    </style>
+
     <style name="customSeekbar" parent="Widget.AppCompat.SeekBar">
         <item name="android:minHeight">2dp</item>
         <item name="android:maxHeight">4dp</item>
