@@ -3,6 +3,7 @@ package com.example.musicapp;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -45,12 +46,10 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.song_row_item, parent, false);
         return new SongViewHolder((view));
     }
-
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Song song = songs.get(position);
         SongViewHolder viewHolder = (SongViewHolder) holder;
-
         viewHolder.titleHolder.setText(song.getTitle());
         viewHolder.durationHolder.setText(getDuration(song.getDuration()));
         viewHolder.singerHolder.setText(song.getSinger());
@@ -66,6 +65,7 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         viewHolder.itemView.setOnClickListener(view -> {
+            context.startService(new Intent(context.getApplicationContext(),PlayerService.class));
             playerView.setVisibility(View.VISIBLE);
             if (!player.isPlaying()) {
                 player.setMediaItems(getMediaItems(), position, 0);

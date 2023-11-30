@@ -2,10 +2,8 @@ package com.example.musicapp;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -26,14 +24,11 @@ import java.io.File;
 
 public class FileListActivity extends AppCompatActivity {
 
-    final String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
-
     final String permissionWrite = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     ActivityResultLauncher<String> storagePermissionLauncher;
     RecyclerView recyclerView;
     TextView noFileText;
     File[] filesAndFolders;
-    private File root;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,23 +51,11 @@ public class FileListActivity extends AppCompatActivity {
     private void userReponses() {
         if ((ContextCompat.checkSelfPermission(this, permissionWrite)) == PackageManager.PERMISSION_GRANTED) {
             fetchFiles();
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        } else {
             if ((shouldShowRequestPermissionRationale(permissionWrite))) {
                 new AlertDialog.Builder(this)
-                        .setTitle("Yêu cầu cấp quyền bộ nhớ").setMessage("Cấp quyền để tiến hành đọc bộ nhớ thiết bị!").setPositiveButton("Chấp nhận", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                storagePermissionLauncher.launch(permissionWrite);
-                            }
-                        }).setNegativeButton("Từ chối", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getApplicationContext(), "Bạn từ chối cấp quyền!!!", Toast.LENGTH_SHORT).show();
-                            }
-                        }).show();
+                        .setTitle("Yêu cầu cấp quyền bộ nhớ").setMessage("Cấp quyền để tiến hành đọc bộ nhớ thiết bị!").setPositiveButton("Chấp nhận", (dialog, which) -> storagePermissionLauncher.launch(permissionWrite)).setNegativeButton("Từ chối", (dialog, which) -> Toast.makeText(getApplicationContext(), "Bạn từ chối cấp quyền!!!", Toast.LENGTH_SHORT).show()).show();
             }
-        } else {
-            Toast.makeText(this, "Bạn từ chối sử dụng ứng dụng!!!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -89,37 +72,26 @@ public class FileListActivity extends AppCompatActivity {
 
         File root = new File(path);
         filesAndFolders = root.listFiles();
+        assert filesAndFolders != null;
         Log.i("FileSize", filesAndFolders.length + " fetchFiles: ");
         if (filesAndFolders.length == 0) {
             noFileText.setVisibility(View.VISIBLE);
             return;
         }
-
         noFileText.setVisibility(View.INVISIBLE);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        FileAdapter fileAdapter = new FileAdapter(this, filesAndFolders, new FileAdapter.ItemClickListener() {
-            @Override
-            public void onItemClick(String path) {
-                new AlertDialog.Builder(FileListActivity.this)
-                        .setTitle("Lựa chọn").setMessage("Bạn muốn mở thư mục hay phát toàn bộ nhạc trong thư mục đã chọn?")
-                        .setPositiveButton("Mở thư mục", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(FileListActivity.this, FileListActivity.class);
-                                intent.putExtra("path", path);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
-                        }).setNegativeButton("Phát nhạc", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(FileListActivity.this, MainActivity.class);
-                                intent.putExtra("path", path);
-                                startActivity(intent);
-                            }
-                        }).show();
-            }
-        });
+        FileAdapter fileAdapter = new FileAdapter(this, filesAndFolders, path1 -> new AlertDialog.Builder(FileListActivity.this)
+                .setTitle("Lựa chọn").setMessage("Bạn muốn mở thư mục hay phát toàn bộ nhạc trong thư mục đã chọn?")
+                .setPositiveButton("Mở thư mục", (dialog, which) -> {
+                    Intent intent1 = new Intent(FileListActivity.this, FileListActivity.class);
+                    intent1.putExtra("path", path1);
+                    intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent1);
+                }).setNegativeButton("Phát nhạc", (dialog, which) -> {
+                    Intent intent1 = new Intent(FileListActivity.this, MainActivity.class);
+                    intent1.putExtra("path", path1);
+                    startActivity(intent1);
+                }).show());
         recyclerView.setAdapter(fileAdapter);
     }
 }

@@ -2,10 +2,15 @@ package com.example.musicapp;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -14,8 +19,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -94,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
     int repeatMode = 1;
 
-    boolean isBond = false;
+    boolean isBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 userReponses();
             }
         });
-        storagePermissionLauncher.launch(permission);
+        //storagePermissionLauncher.launch(permission);
         recordAudioPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
             if (granted && player.isPlaying()) {
                 activateAudioVisualizer();
@@ -129,13 +134,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        player = new ExoPlayer.Builder(this).build();
+//        player = new ExoPlayer.Builder(this).build();
 
         initView();
 
-        playerControl();
+        //playerControl();
+
+        doBindService();
 
     }
+
+    private void doBindService() {
+        Intent playerServiceIntent = new Intent(this, PlayerService.class);
+        bindService(playerServiceIntent, playerServiceConn, Context.BIND_AUTO_CREATE);
+        isBound = true;
+    }
+
+    ServiceConnection playerServiceConn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            PlayerService.ServiceBinder binder = (PlayerService.ServiceBinder) service;
+            player = binder.getPlayerService().player;
+            isBound = true;
+            storagePermissionLauncher.launch(permission);
+            playerControl();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
 
     private void playerControl() {
         songNameView.setSelected(true);
@@ -214,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
         playPauseBtn.setOnClickListener(view -> playOrPausePlayer());
         homePlayPauseBtn.setOnClickListener(view -> playOrPausePlayer());
 
-        homeCloseBtn.setOnClickListener(view-> closeHomeMenu());
+        homeCloseBtn.setOnClickListener(view -> closeHomeMenu());
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int progressValue = 0;
@@ -244,16 +273,19 @@ public class MainActivity extends AppCompatActivity {
                 player.setRepeatMode(ExoPlayer.REPEAT_MODE_ONE);
                 repeatMode = 2;
                 repeatModeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_one, 0, 0, 0);
+                repeatModeBtn.getCompoundDrawables()[0].setTint(bodyTextColor);
             } else if (repeatMode == 2) {
                 player.setShuffleModeEnabled(true);
                 player.setRepeatMode(ExoPlayer.REPEAT_MODE_ALL);
                 repeatMode = 3;
                 repeatModeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shuffle, 0, 0, 0);
+                repeatModeBtn.getCompoundDrawables()[0].setTint(bodyTextColor);
             } else if (repeatMode == 3) {
                 player.setRepeatMode(ExoPlayer.REPEAT_MODE_ALL);
                 player.setShuffleModeEnabled(false);
                 repeatMode = 1;
                 repeatModeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat, 0, 0, 0);
+                repeatModeBtn.getCompoundDrawables()[0].setTint(bodyTextColor);
             }
         });
         updatePlayerColor();
@@ -305,36 +337,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updatePlayerPositionProgress() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (player.isPlaying()) {
-                    progressView.setText((getReadableTime((int) player.getCurrentPosition())));
-                    seekBar.setProgress((int) player.getCurrentPosition());
-                }
-                if (player.getCurrentPosition() == player.getDuration()) {
-                    if (repeatMode == 2) {
-                        player.seekTo(0);
-                    } else if (repeatMode == 3) {
-                        Random random = new Random();
-                        int randomPosition = random.nextInt(allSongs.size() + 1);
-                    } else {
-                        skipNextSong();
-                    }
-                }
-                updatePlayerPositionProgress();
+        new Handler().postDelayed(() -> {
+            if (player.isPlaying()) {
+                progressView.setText((getReadableTime((int) player.getCurrentPosition())));
+                seekBar.setProgress((int) player.getCurrentPosition());
             }
+            if (player.getCurrentPosition() == player.getDuration()) {
+                if (repeatMode == 2) {
+                    player.seekTo(0);
+                } else if (repeatMode == 3) {
+                    Random random = new Random();
+                    int randomPosition = random.nextInt(allSongs.size() + 1);
+                    player.seekTo(randomPosition, 0);
+                } else {
+                    skipNextSong();
+                }
+            }
+            updatePlayerPositionProgress();
         }, 1000);
     }
 
     private void showCurrentArtWork() {
-        artworkView.setImageURI(Objects.requireNonNull(player.getCurrentMediaItem().mediaMetadata.artworkUri));
+        artworkView.setImageURI(Objects.requireNonNull(Objects.requireNonNull(player.getCurrentMediaItem()).mediaMetadata.artworkUri));
 
         if (artworkView.getDrawable() == null) {
             artworkView.setImageResource(R.drawable.default_artwork);
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private String getReadableTime(int currentPosition) {
         String totalDurationText;
         int sec = currentPosition / 1000;
@@ -408,7 +439,6 @@ public class MainActivity extends AppCompatActivity {
                 playlistBtn.getCompoundDrawables()[0].setTint(bodyTextColor);
             }
         });
-
     }
 
     private void exitPlayerView() {
@@ -487,11 +517,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (player.isPlaying()) {
-            player.stop();
-        }
-        player.release();
 
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+        doUnbindService();
+        Intent playerServiceIntent = new Intent(this, PlayerService.class);
+        stopService(playerServiceIntent);
+    }
+
+    private void doUnbindService() {
+        if (isBound) {
+            unbindService(playerServiceConn);
+            if (player.isPlaying()) {
+                player.stop();
+            }
+            player.release();
+            isBound = false;
+        }
     }
 
     @Override
@@ -506,23 +548,11 @@ public class MainActivity extends AppCompatActivity {
     private void userReponses() {
         if ((ContextCompat.checkSelfPermission(this, permission)) == PackageManager.PERMISSION_GRANTED) {
             fetchSongs();
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        } else {
             if ((shouldShowRequestPermissionRationale(permission))) {
                 new AlertDialog.Builder(this)
-                        .setTitle("Yêu cầu cấp quyền bộ nhớ").setMessage("Cấp quyền để tiến hành đọc bộ nhớ thiết bị!").setPositiveButton("Chấp nhận", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                storagePermissionLauncher.launch(permission);
-                            }
-                        }).setNegativeButton("Từ chối", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getApplicationContext(), "Bạn từ chối cấp quyền!!!", Toast.LENGTH_SHORT).show();
-                            }
-                        }).show();
+                        .setTitle("Yêu cầu cấp quyền bộ nhớ").setMessage("Cấp quyền để tiến hành đọc bộ nhớ thiết bị!").setPositiveButton("Chấp nhận", (dialog, which) -> storagePermissionLauncher.launch(permission)).setNegativeButton("Từ chối", (dialog, which) -> Toast.makeText(getApplicationContext(), "Bạn từ chối cấp quyền!!!", Toast.LENGTH_SHORT).show()).show();
             }
-        } else {
-            Toast.makeText(this, "Bạn từ chối sử dụng ứng dụng!!!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -534,13 +564,10 @@ public class MainActivity extends AppCompatActivity {
         }
         List<Song> songs = new ArrayList<>();
         Uri mediaStoreUri;
+        assert path != null;
         String newPath = path.replaceFirst("/storage/emulated/0", "");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mediaStoreUri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
-        } else {
-            mediaStoreUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        }
+        mediaStoreUri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
 
         String[] projection = new String[]{
                 MediaStore.Audio.Media._ID,
@@ -556,6 +583,7 @@ public class MainActivity extends AppCompatActivity {
         String[] selectionArgs = new String[]{"%" + newPath + "/%"};
         Log.i("Test", path);
         try (Cursor cursor = getContentResolver().query(mediaStoreUri, projection, selection, selectionArgs, sortOrder)) {
+            assert cursor != null;
             int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
             int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
             int duationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION);
@@ -614,6 +642,7 @@ public class MainActivity extends AppCompatActivity {
         MenuItem menuItem = menu.findItem(R.id.searchBtn);
         SearchView searchView = (SearchView) menuItem.getActionView();
 
+        assert searchView != null;
         SearchSong(searchView);
 
         return super.onCreateOptionsMenu(menu);
